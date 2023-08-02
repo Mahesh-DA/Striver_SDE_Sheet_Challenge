@@ -1,24 +1,31 @@
-bool color(int r,int c,int n,vector<vector<int>> &mat, int m,vector<vector<int>> &v)
-{   //cout<<r<<" "<<c<<" "<<n<<endl;
+bool solve(int r,int n,int m,vector<vector<int>> &mat,vector<int> &clr,vector<int> &node)
+{
     if(r==n) return true;
-    if(c==n) return color(r+1,r+2,n,mat,m,v);
-    if(!mat[r][c]) return color(r,c+1,n,mat,m,v);
-    for(int i=0;i<m;i++)
+    if(!clr[r])
     {
-        if(!v[r][i])
+        for(int i=1;i<=m;i++)
+        {   if(node[i] && mat[r][node[i]]) continue;
+            clr[r]=i;
+            node[i]=r;
+            if(solve(r,n,m,mat,clr,node)) return true;
+            clr[r]=0;
+            node[i]=0;
+        }
+        return false;
+    }
+    for(int i=0;i<n;i++)
+    {
+        if(mat[r][i])
         {
-            v[r][i]=1;
-            v[c][i]=1;
-            if(color(r,c+1,mat.size(),mat,m,v)) return 1;
-            v[r][i]=0;
-            v[c][i]=0;
+            if(clr[r]==clr[i]) return false;
         }
     }
-    return 0;
+    return solve(r+1,n,m,mat,clr,node);
 }
 string graphColoring(vector<vector<int>> &mat, int m) {
     // Write your code here
-    vector<vector<int>> v(mat.size(),vector<int> (m));
-    
-    if(color(0,0,mat.size(),mat,m,v)) return "YES"; return "NO";
+    vector<int> clr(mat.size()),node(m);
+    if (solve(0,mat.size(),m,mat,clr,node)) 
+        return "YES"; 
+    return "NO";
 }
